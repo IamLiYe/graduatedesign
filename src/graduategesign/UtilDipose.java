@@ -439,4 +439,62 @@ public class UtilDipose {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * 字符串左填充为定长
+	 * @param srcStr 待处理字符串
+	 * @param filler 如果源字符串长度小于请求处理后的的长度，用该字符进行填充
+	 * @param strlength 填充后或者截取后的的字符串长度
+	 * @return 处理后的字符串
+	 */
+	public static String lestPad(String srcStr,char filler,int strLength){
+		String resultStr="";
+		String srcStrTrim=srcStr.trim();
+		if(srcStr!=null){
+			int length=srcStrTrim.length();
+			if(length>strLength){
+				resultStr=srcStrTrim.substring(0, strLength);
+			}else if(length==strLength){
+				resultStr=srcStrTrim;
+			}
+			else{
+				//左填充
+				StringBuilder temp=new StringBuilder();
+				for(int i=0;i<strLength-length;i++){
+					temp.append(filler);
+				}
+				resultStr=temp.append(srcStrTrim).toString();
+			}
+		}
+		return resultStr;
+	}
+	
+	/**
+	 * 字符串右填充为定长
+	 * @param srcStr 待处理字符串
+	 * @param filler 如果源字符串长度小于请求处理后的的长度，用该字符进行填充
+	 * @param strlength 填充后或者截取后的的字符串长度
+	 * @return 处理后的字符串
+	 */
+	public static String rigntPad(String srcStr,char filler,int strLength){
+		String resultStr="";
+		String srcStrTrim=srcStr.trim();
+		if(srcStr!=null){
+			int length=srcStrTrim.length();
+			if(length>strLength){
+				resultStr=srcStrTrim.substring(0, strLength);
+			}else if(length==strLength){
+				resultStr=srcStrTrim;
+			}
+			else{
+				//右填充
+				StringBuilder temp=new StringBuilder(srcStrTrim);
+				for(int i=0;i<strLength-length;i++){
+					temp.append(filler);
+				}
+				resultStr=temp.toString();
+			}
+		}
+		return resultStr;
+	}
 }
