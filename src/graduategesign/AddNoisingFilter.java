@@ -189,7 +189,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	 * 
 	 */
 	private void addSaltAndPepperNoise(int[]srcArray,int[] destArray,Random random){
-		System.out.println("SlatAndPepper");
+		//System.out.println("SlatAndPepper");
 		int spn=(int)(srcArray.length*salt_pepperPercent);
 		int[] randomIndexs=UtilDipose.randomSort(srcArray.length, spn, null, random);
 		for(int i=0;i<spn;i++){
@@ -210,7 +210,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	 * @param random
 	 */
 	private void addSaltNoise(int[]srcArray,int[] destArray,Random random){
-		System.out.println("Salt");
+		//System.out.println("Salt");
 		int sn=(int)(srcArray.length*saltPercent);
 		int[] randomIndexs=UtilDipose.randomSort(srcArray.length, sn, null, random);
 		for(int i=0;i<sn;i++){
@@ -225,7 +225,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	 * @param random
 	 */
 	private void addPepperNoise(int[]srcArray,int[] destArray,Random random){
-		System.out.println("Pepper");
+		//System.out.println("Pepper");
 		int pn=(int)(srcArray.length*pepperPercent);
 		int[] randomIndexs=UtilDipose.randomSort(srcArray.length, pn, null, random);
 		for(int i=0;i<pn;i++){
@@ -240,7 +240,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	 * @param random
 	 */
 	private void addSPNoise(int[]srcArray,int[] destArray,Random random){
-		System.out.println("SP");
+		//System.out.println("SP");
 		int sn=(int)(srcArray.length*saltPercent);
 		int pn=(int)(srcArray.length*pepperPercent);
 		int spn=sn+pn;
@@ -269,7 +269,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	 * ∂‘RGBÕºœÒÃÌº”∏ﬂÀπ‘Î…˘
 	 */
 	private void addGaussianToRGB(int[]srcArray,int[]destArray,Random random){
-		System.out.println("GaussianRGB");
+		//System.out.println("GaussianRGB");
 		for(int i=0;i<srcArray.length;i++){
 			int r=srcArray[i]>>16&0xff;
 			int g=srcArray[i]>>8&0xff;
@@ -286,7 +286,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	 * ∂‘ª“∂»ÕºœÒÃÌº”≤¥À…‘Î…˘
 	 */
 	private void addPoissonToGray(int[]srcArray,int[] destArray,Random random){
-		System.out.println("PoissonGRAY");
+		//System.out.println("PoissonGRAY");
 		for(int i=0;i<srcArray.length;i++){
 			int gray=srcArray[i]&0xff;
 			//System.out.printf("before: %3d",gray);
@@ -300,7 +300,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	 * ∂‘RGBÕºœÒÃÌº”≤¥À…‘Î…˘
 	 */
 	private void addPoissonToRGB(int[]srcArray,int[] destArray,Random random){
-		System.out.println("PoissonRGB");
+		//System.out.println("PoissonRGB");
 		for(int i=0;i<srcArray.length;i++){
 			int r=srcArray[i]>>16&0xff;
 			int g=srcArray[i]>>8&0xff;

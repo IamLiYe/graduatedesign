@@ -8,6 +8,11 @@ import java.util.Date;
 
 import com.mysql.jdbc.Util;
 
+/**
+ * 测试流程
+ * @author Administrator
+ * 待实现中...
+ */
 
 public class TestFlow {
 	

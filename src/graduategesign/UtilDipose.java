@@ -10,15 +10,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
+import javax.imageio.ImageIO;import javax.xml.parsers.DocumentBuilder;
 
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 
+import Jama.Matrix;
+
 
 /**
  * 基本处理类
- * 包括：彩色图像的灰度化，图像处理标准PNSR
+ * 包括：
+ * 1,彩色图像的灰度化，图像处理标准PNSR,SNR,EPI
+ * 2,灰度图像转换
+ * 3,double[][] & int[]
+ * 4,字符串填充
+ * 5,图像RGB获取和设置
+ * 6,图像创建
+ * 7，保存图像和图表
  * @author Administrator
  *
  */
@@ -42,7 +51,7 @@ public class UtilDipose {
 	/*
 	 * 默认保存地点
 	 */
-	private static final String PICTURE_SAVE_PATH="D:\\chart\\svd\\";
+	private static final String PICTURE_SAVE_PATH="D:\\chart\\svd\\pepperandslat\\";
 	/**
 	 * 将rgb彩色图像转换为灰度图像
 	 * @param srcImage 源图像
@@ -94,6 +103,8 @@ public class UtilDipose {
 	 * @return 改变后的图像
 	 */
 	public static int[] getRGB(BufferedImage image,int startX,int startY,int width,int height,int[] rgbArray){
+		/*if(rgbArray==null)
+			rgbArray=new int[width*height];*/
 		int type=image.getType();
 		if(type==BufferedImage.TYPE_INT_ARGB||type==BufferedImage.TYPE_INT_RGB){
 			return (int [])image.getRaster().getDataElements(startX,startY, width, height, rgbArray);
@@ -124,6 +135,8 @@ public class UtilDipose {
 	 */
 	public static void setRGB(BufferedImage image,int startX,int startY,int width,int height,int[] rgbArray){
 		int type=image.getType();
+		if(rgbArray==null)
+			rgbArray=new int[width*height];
 		if(type==BufferedImage.TYPE_INT_ARGB||type==BufferedImage.TYPE_INT_RGB){
 			image.getRaster().setDataElements(startX,startY, width, height, rgbArray);
 		}
@@ -348,10 +361,11 @@ public class UtilDipose {
 	
 	/**
 	 * 将二维double数组转换为一维integer数组
-	 * @param destMatrix
-	 * @param width
-	 * @param height
-	 * @return
+	 * 这里返回的是一个RGB三个通道相等的int数组
+	 * @param destMatrix 待转换的数组
+	 * @param width 数组宽
+	 * @param height 数组高
+	 * @return 
 	 */
 	public static int[] toIntegerArray(double[][] destMatrix,int width,int height){
 		int[] array=new int[width*height];
@@ -363,9 +377,14 @@ public class UtilDipose {
 				 * 注意gray要进行必要截断处理
 				 * (gray,gray,gray)->(red,green,blue)
 				 */
-				int gray=(int)(destMatrix[row][col]);
+				int gray=(int)Math.round(destMatrix[row][col]);
 				gray=gray>255?255:(gray<0?0:gray);
-				array[index]=gray<<16|gray<<8|gray;
+				array[index]=(0xff<<24)|(gray<<16)|(gray<<8)|gray;
+				//int a=(array[index]>>24)&0xff;
+				//int r=(array[index]>>16)&0xff;
+				//int g=(array[index]>>8)&0xff;
+				//int b=array[index]&0xff;
+				//System.out.print("r:"+r+"g"+g+"b"+b);
 			}
 		}
 		return array;
@@ -496,5 +515,299 @@ public class UtilDipose {
 			}
 		}
 		return resultStr;
+	}
+	
+	/**
+	 * 根据一维int数组设置二维double数组的值
+	 * @param matrix
+	 * @param startX
+	 * @param startY
+	 * @param width
+	 * @param height
+	 * @param pixels
+	 */
+	public static void setArray(double[][]matrix,
+			int startX,int startY,int width,int height,
+			int[] pixels){
+		int count=0;
+		for(int col=startX;col<width+startX;col++){
+			for(int row=startY;row<height+startY;row++){
+				double gray=pixels[count]&0xff;//blue
+				matrix[row][col]=gray;
+				count++;
+			}
+		}
+	}
+	
+	/**
+	 * 根据二维double数组获取指定位置的值存放在一维数组中
+	 * @param matrix
+	 * @param startX
+	 * @param startY
+	 * @param width
+	 * @param height
+	 * @param pixels
+	 * @return
+	 */
+	public static int[] getArray(
+			double[][]matrix,
+			int startX,int startY,int width,int height,
+			int[] pixelArray,
+			int imageWidth,
+			int pstartX,int pstartY,int pwidth,int pheight){
+		if(pixelArray==null)
+			pixelArray=new int[width*height];
+		int[] pixels=new int[width*height];
+		int count=0;
+		for(int row=startY;row<startY+height;row++){
+			for(int col=startX;col<startX+width;col++){
+				int gray=(int)Math.round(matrix[row][col]);
+				pixels[count++]=(0xff<<24)|(gray<<16)|(gray<<8)|gray;
+			}
+		}
+		count=0;
+		for(int row=pstartY;row<pstartY+pheight;row++){
+			for(int col=pstartX;col<pstartX+pwidth;col++){
+				int index=row*imageWidth+col;
+				pixelArray[index]=pixels[count++];
+			}
+		}
+		return pixelArray;
+	}
+	
+	/**
+	 * 行切片,这里是将原像素转置，用列切片的方法做的
+	 * @param pixelArray
+	 * @param width
+	 * @param height
+	 * @param skip
+	 * @return
+	 */
+	public static double[][][] getSVDMODE2Array(int[][]pixelArray,int width,int height,int skip)
+	{
+		int[][] pixelArray_=new int[pixelArray.length][];
+		for(int i=0;i<pixelArray.length;i++){//转置，行列交换
+			pixelArray_[i]=UtilDipose.rgbTranspose(pixelArray[i], width, height);
+			//printRGB(pixelArray_[i],height,width);
+		}
+		int width_=height;
+		int height_=width;
+		double[][][] matrixs_=getSVDMODE1Array(pixelArray_, width_, height_, skip);		
+		return matrixs_;
+	}
+	
+	public static int[][] toMODE2Array(double[][][] matrixs,int width_,int height_,int skip){
+		int[][] pixelArray_=toMODE1Array(matrixs, width_, height_, skip);
+		int[][] pixelArray=new int[pixelArray_.length][];
+		for(int i=0;i<pixelArray.length;i++){//转置，行列交换
+			pixelArray[i]=UtilDipose.rgbTranspose(pixelArray_[i], width_, height_);
+			//printRGB(pixelArray[i],height_,width_);
+		}
+		return pixelArray;
+	}
+	/**
+	 * 以列对图像数组进行切片
+	 * @param pxiels 图像数组int[][]类型
+	 * @param width 每张图像的长度
+	 * @param hegiht 每张图像的宽度
+	 * @param skip 列的宽度
+	 * @return 切片后的矩阵数组double[][][]类型
+	 */
+	public static double[][][] getSVDMODE1Array(int[][]pixelArray,int width,int height,int skip){
+		int colb=width/skip;//前面colb个组为固定宽带skip
+		int coll=width%skip;//最后剩下的为零散组,为零则不用理会
+		double[][][] array;
+		int[] pixels;
+		//int count;
+		if(coll==0){
+			array=new double[colb][height][pixelArray.length*skip];
+			/**
+			 * 对于每一原始数据，它在转化的矩阵中的位置相同
+			 */
+			int startX=0;//用于确定切片后的位置
+			for(int i=0;i<pixelArray.length;i++){
+				int count=0;
+				for(int j=0;j<width;j+=skip){
+					pixels=UtilDipose.getRGB(pixelArray[i],width,j,0,skip,height,null);
+					UtilDipose.setArray(array[count++],startX, 0, skip, height, pixels);
+				}
+				startX+=skip;
+			}
+		}	
+		else
+		{
+			array=new double[colb+1][][];
+			for(int i=0;i<colb;i++)
+				array[i]=new double[height][pixelArray.length*skip];
+			array[colb]=new double[height][coll*pixelArray.length];
+			/**
+			 * 对于每一原始数据，它在转化的矩阵中的位置相同
+			 */
+			int startX=0;//用于确定切片后的位置
+			int lstartX=0;//用于确定最后一片切片的位置
+			for(int i=0;i<pixelArray.length;i++){
+				int count=0;
+				for(int j=0;j<width-coll;j+=skip){
+					pixels=UtilDipose.getRGB(pixelArray[i],width,j,0,skip,height,null);
+					UtilDipose.setArray(array[count++],startX, 0, skip, height, pixels);
+				}
+				pixels=UtilDipose.getRGB(pixelArray[i],width,width-coll,0,coll,height,null);
+				UtilDipose.setArray(array[count], lstartX,0,coll, height, pixels);
+				startX+=skip;
+				lstartX+=coll;
+			}
+		}
+			
+		return array;
+	}
+	
+	/**
+	 * 重组被列切片后的数组
+	 * @param pixelArray
+	 * @param width
+	 * @param height
+	 * @param skip
+	 * @return
+	 */
+	public static int[][] toMODE1Array(double[][][] matrixs,int width,int height,int skip){
+		int colb=matrixs[0][0].length/skip;
+		int coll=width%skip;
+		System.out.println("colb"+colb);
+		System.out.println("coll"+coll);
+		int[][] pixelArray;
+		//int colb=width/skip;	
+		int count;
+		if(coll==0){
+			pixelArray=new int[colb][width*height];
+			int pstartX=0;
+			for(int i=0;i<matrixs.length;i++){//遍历每一个切面
+				count=0;
+				//还原元素
+				int cols=matrixs[i][0].length;
+				for(int j=0;j<cols;j+=skip){
+					getArray(matrixs[i],j,0,skip, height, 
+							pixelArray[count++],width, 
+							pstartX,0,skip,height);	
+				}
+				pstartX+=skip;
+			}
+		}else{
+			pixelArray=new int[colb][width*height];
+			int pstartX=0;
+			for(int i=0;i<matrixs.length-1;i++){//遍历每一个切面
+				count=0;
+				//还原元素
+				int cols=matrixs[i][0].length;
+				for(int j=0;j<cols;j+=skip){
+					getArray(matrixs[i],j,0,skip, height, 
+							pixelArray[count++],width, 
+							pstartX,0,skip,height);	
+				}
+				pstartX+=skip;
+			}
+			//最后一个切片进行特殊处理
+			count=0;
+			for(int i=0;i<matrixs[matrixs.length-1][0].length;i+=coll){
+				getArray(matrixs[matrixs.length-1],i,0,
+						coll, height, 
+						pixelArray[count++],width, 
+						pstartX,0,coll,height);
+			}
+		}
+		return pixelArray;
+	}
+	public static int[] getRGB(int[] pixels,int imageWidth,int startX,int startY,int width,int height,int[] dest){
+		if(dest==null)
+			dest=new int[width*height];
+		int count=0;
+		for(int col=startX;col<width+startX;col++){
+			for(int row=startY;row<height+startY;row++){
+				dest[count++]=pixels[row*imageWidth+col];
+			}
+		}
+		return dest;
+	}
+	
+	
+	/**
+	 * 矩阵右边连接
+	 */
+	public static double[][] leftJoin(
+			double[][] srcMatrix,
+			double [][]joinMatrix,
+			int startX,int startY,int jwidth,int jheight) {
+		int srcWidth=srcMatrix[0].length;
+		int joinWidth=joinMatrix[0].length;
+		int width=srcWidth+joinWidth;
+		int height=srcMatrix.length;
+		double[][] result=new double[height][width];
+		
+		return result;
+	}
+	
+	public static double[][] leftSeparate()
+	{
+		return null;
+	}
+	
+	/**
+	 * RGB数组转置
+	 */
+	public static int[] rgbTranspose(int[] pixels,int width,int height){
+		int[] array=new int[width*height];
+		for(int row=0;row<height;row++){
+			for(int col=0;col<width;col++){
+				array[col*height+row]=pixels[row*width+col];
+			}
+		}
+		return array;
+	}
+	
+	/**
+	 * double矩阵数组转置
+	 * 转置后实际width和height交换
+	 * 源数组不改变
+	 */
+	public static double[][] matrixTranspose(double[][] matrix,int width,int height){
+		double[][] mat=new double[width][height];
+		for(int row=0;row<height;row++){
+			for(int col=0;col<width;col++){
+				mat[col][row]=matrix[row][col];
+			}
+		}
+		return mat;
+	}
+	
+	/**
+	 * 遍历输出RGB数组元素
+	 * 转置后实际width和height交换
+	 * 源数组不改变
+	 */
+	public static void printRGB(int[] pixels,int width,int height){
+		System.out.println("\tRGB===================RGB");
+		for(int row=0;row<height;row++){
+			for(int col=0;col<width;col++){
+				System.out.print("\t"+pixels[row*width+col]);;
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+	
+	/**
+	 * 遍历输出矩阵元素
+	 * @param pixels
+	 * @param width
+	 * @param height
+	 */
+	public static void printMatrix(double[][] matrix,int width,int height){
+		System.out.println("\tMATRIX===================MATRIX");
+		for(int row=0;row<height;row++){
+			for(int col=0;col<width;col++){
+				System.out.print("\t"+matrix[row][col]);;
+			}
+			System.out.println();
+		}
+		System.out.println();
 	}
 }

@@ -13,30 +13,30 @@ public class StatisticalFilter extends AbstractBufferedImageOp{
 	}
 	
 
-	/*
+	/**
 	 * 中间值
 	 */
 	public static final int STATISTICAL_TYPE_HALF=0;
 	
-	/*
+	/**
 	 * 最大最小值
 	 */
 	public static final int STATISTICAL_TYPE_MIN_MAX=1;
 	
-	/*
+	/**
 	 * 最小值
 	 */
 	public static final int STATISTICAL_TYPE_MIN=2;
 	
-	/*
+	/**
 	 * 最大值
 	 */
 	public static final int STATISTICAL_TYPE_MAX=3;
-	/*
+	/**
 	 * 中间点
 	 */
 	public static final int STATISTICAL_TYPE_CENTER=4;
-	/*
+	/**
 	 * 统计类型
 	 */
 	private int type=STATISTICAL_TYPE_HALF;//默认几何平均
