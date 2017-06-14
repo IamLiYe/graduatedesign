@@ -1,7 +1,11 @@
 package graduategesign;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,6 +75,10 @@ public class ImagePanel extends JPanel {
 				int x=(i%IMAGE_ROW_NUMBER)*(imageWidth+IMAGE_ROW_PITCH)+IMAGE_ROW_PITCH;
 				int y=(i/IMAGE_ROW_NUMBER)*(imageHeight+IMAGE_COLUMN_PITCH)+IMAGE_COLUMN_PITCH;
 				g2d.drawImage(imageArray.get(i),x,y,imageWidth,imageHeight,null);
+			    AttributedString ats=new AttributedString("ͼ"+i);
+			    ats.addAttribute(TextAttribute.FONT,new Font("",0, 16));
+			    AttributedCharacterIterator iterator=ats.getIterator();
+			    g2d.drawString(iterator,x+10,y+imageHeight+20);
 			}
 		}
 	}

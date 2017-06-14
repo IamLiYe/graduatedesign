@@ -25,7 +25,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 	public final static int NOISE_TYPE_POISSON =8;
 	
 	//Ä¬ÈÏ½·ÑÎÔëÉù±ÈÀý
-	public final static double DEFALUT_SP_PERCENT=0.01;
+	public final static double DEFALUT_SP_PERCENT=0.1;
 	
 	private double noiseFactor =NOISE_FACTOR;
 	
@@ -130,7 +130,7 @@ public class AddNoisingFilter extends AbstractBufferedImageOp {
 			p *= random.nextDouble();
 		} while (p >= l);
 		double retValue = Math.max((pixel + (k - 1) /pMeanFactor - noiseFactor), 0);
-		return clamp((int) retValue);
+		return clamp((int)Math.round(retValue));
 	}
 
 	/**
