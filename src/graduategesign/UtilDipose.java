@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.Random;
 
 import javax.imageio.ImageIO;import javax.xml.parsers.DocumentBuilder;
@@ -51,7 +53,7 @@ public class UtilDipose {
 	/*
 	 * 默认保存地点
 	 */
-	private static final String PICTURE_SAVE_PATH="D:\\chart\\svd\\pepperandslat\\";
+	private static final String PICTURE_SAVE_PATH="D:\\chart\\svd\\tf\\";
 	/**
 	 * 将rgb彩色图像转换为灰度图像
 	 * @param srcImage 源图像
@@ -809,5 +811,124 @@ public class UtilDipose {
 			System.out.println();
 		}
 		System.out.println();
+	}
+	
+	public static Long id=0L;
+	public  synchronized static Long  generateID(){
+		return id++;
+	}
+	
+	/**
+	 * 单元测试
+	 * @param args
+	 */
+	public static void main(String[] args){
+		for(int i=0;i<10;i++){
+			Thread thread=new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					System.out.println(generateID());
+				}
+			});
+			thread.start();
+		}
+	}
+	
+	/**
+	 * 原始图像string
+	 * @return
+	 */
+	public static String toSGImageStr(){
+		return null;
+	}
+	/**
+	 * 原始图像名字
+	 */
+	public static String toSGImageName(){
+		return null;
+	}
+	/**
+	 * 噪声图像string
+	 */
+	public static String toNoiseImageStr(){
+		return null;
+	}
+	/**
+	 * 噪声图像名字
+	 * @return
+	 */
+	public static String toNoiseImageName(){
+		return null;
+	}
+	/**
+	 * 去噪图像string
+	 */
+	public static String DeNoiseImageStr(){
+		return null;
+	}
+	/**
+	 * 去噪图像名字
+	 * @return
+	 */
+	public static String toDeNoiseName(){
+		return null;
+	}
+	
+	public static void printPE(double[] psnrs,double[] snr,double[] epi,PrintStream out){
+		int length=psnrs.length;
+		double psum=0,esum=0,ssum=0,pavg=0,savg=0,eavg=0;
+		double pMax=0,pMin=0,eMax=0,eMin=0,sMax=0,sMin=0;
+		int pMaxi,sMaxi,eMaxi,pMini,sMini,eMini;
+		
+		//赋予初值
+		psum=0;esum=0;ssum=0;pavg=0;savg=0;eavg=0;
+		pMax=0;pMin=0;eMax=0;eMin=0;sMax=0;sMin=0;
+		pMaxi=0;sMaxi=0;eMaxi=0;pMini=0;sMini=0;eMini=0;
+		for(int i=0;i<length;i++){
+			psum+=psnrs[i];
+			ssum+=snr[i];
+			esum+=epi[i];
+			//System.out.println("esum["+i+"]"+":"+epi[i]);
+		}
+		//System.out.println("psum"+psum+"ssum"+ssum+"esum"+esum);
+		pavg=psum/length;
+		savg=ssum/length;
+		eavg=esum/length;
+		pMax=pMin=psnrs[0];
+		sMax=sMin=snr[0];
+		eMax=eMin=epi[0];
+		for(int i=1;i<length;i++){
+			//最大值
+			if(psnrs[i]>pMax){
+				pMax=psnrs[i];
+				pMaxi=i;
+			}
+			if(snr[i]>sMax){
+				sMax=snr[i];
+				sMaxi=i;
+			}
+			if(epi[i]>eMax){
+				eMax=epi[i];
+				eMaxi=i;
+			}
+			//最小值
+			if(psnrs[i]<pMin){
+				pMin=psnrs[i];
+				pMini=i;
+			}
+			if(snr[i]<sMin){
+				sMin=snr[i];
+				sMini=i;
+			}
+			if(epi[i]<eMin){
+				eMin=epi[i];
+				eMini=i;
+			}
+		}
+		out.printf("PSNR :MAX[%2d]=%4.2f;MIN[%2d]=%4.2f;AVG=%4.2f\n",pMaxi,pMax,pMini,pMin,pavg);
+		out.printf("_SNR :MAX[%2d]=%4.2f;MIN[%2d]=%4.2f;AVG=%4.2f\n",sMaxi,sMax,sMini,sMin,savg);
+		out.printf("_EPI :MAX[%2d]=%4.2f;MIN[%2d]=%4.2f;AVG=%4.2f\n",eMaxi,eMax,eMini,eMin,eavg);
 	}
 }

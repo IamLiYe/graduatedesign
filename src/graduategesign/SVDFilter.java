@@ -134,6 +134,9 @@ public class SVDFilter extends AbstractBufferedImageOp{
 	public void setSvdType(int svdType){
 		this.svdType=svdType;
 	}
+	public int getSvdType(){
+		return this.svdType;
+	}
 	public double getSingularPercent() {
 		return singularPercent;
 	}

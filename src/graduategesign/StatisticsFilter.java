@@ -12,7 +12,16 @@ public class StatisticsFilter extends AbstractBufferedImageOp {
 	
 	private int kernel_size = 3; // default 3
 	private int type = 8; // default mean type
+	private int workNumber=1;
 	
+	public int getWorkNumber() {
+		return workNumber;
+	}
+
+	public void setWorkNumber(int workNumber) {
+		this.workNumber = workNumber;
+	}
+
 	public StatisticsFilter()
 	{
 		System.out.println("Statistics Filter");
@@ -26,12 +35,22 @@ public class StatisticsFilter extends AbstractBufferedImageOp {
 		this.kernel_size = kernelSize;
 	}
 	
+	
+	
 	public int getType() {
 		return type;
 	}
 	
 	public void setType(int type) {
 		this.type = type;
+	}
+	
+	public BufferedImage filter_(BufferedImage src, BufferedImage dest) {
+		BufferedImage temp=src;
+		for(int i=0;i<workNumber;i++){
+			temp=filter(temp, null);
+		}
+		return temp;
 	}
 
 	@Override

@@ -31,7 +31,7 @@ public class MainUI extends JFrame
 	
 	private JButton imgBtn;
 	private JButton processBtn;
-	private ImagePanel imagePanel;
+	public static ImagePanel imagePanel;
 	
 	// image
 	private BufferedImage srcImage;

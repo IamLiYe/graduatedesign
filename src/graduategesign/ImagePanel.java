@@ -88,7 +88,8 @@ public class ImagePanel extends JPanel {
 		this.imageArray.clear();
 		this.imageArray.add(sourceImage);
 		//System.out.println("32");
-		lastTest();
+		//lastTest();
+		testN();
 		//testTSVD();
 		//testAddNoise();
 		//灰度化
@@ -493,8 +494,9 @@ public class ImagePanel extends JPanel {
 		UtilDipose.savePictureJPG(gray, "灰度图像\\灰度图像.jpg");
 		System.out.println(UtilDipose.getEPI(gray, gray));
 		AddNoisingFilter noisefilter=new AddNoisingFilter();//添加噪声
-		noisefilter.setNoiseType(AddNoisingFilter.NOISE_TYPE_SALTANDPEPPER);//设置高斯噪声
-		noisefilter.setSalt_pepperPercent(0.1);
+		noisefilter.setNoiseType(AddNoisingFilter.NOISE_TYPE_GAUSSION);//设置高斯噪声
+		noisefilter.setNosizeFactor(50);
+		noisefilter.setSalt_pepperPercent(0.2);
 		BufferedImage noise=noisefilter.filter(gray, null);
 		this.imageArray.add(noise);
 		//设置均值滤波器
@@ -540,7 +542,7 @@ public class ImagePanel extends JPanel {
 			snr[i]=UtilDipose.getSNR(gray,temp);
 			epi[i]=UtilDipose.getEPI(gray,temp);
 		}
-		printPE(psnrs, snr, epi);
+		UtilDipose.printPE(psnrs, snr, epi,System.out);
 		mfilter.setMeanType(MeanFilter.MEAN_TYPE_ARITHMETIC);
 		for(int i=0;i<64;i++){
 			temp=mfilter.filter(noises.get(i), null);
@@ -642,7 +644,34 @@ public class ImagePanel extends JPanel {
 	}
 
 	
-	public void printPE(double[] psnrs,double[] snr,double[] epi){
+	public void testN(){
+		BufferedImage gray=UtilDipose.getGrayImage(sourceImage,null);//获取灰度图像
+		//this.imageArray.add(gray);//将图像显示
+		UtilDipose.savePictureJPG(gray, "灰度图像\\标准测试s\\灰度图像.jpg");
+		BufferedImage temp;
+		AddNoisingFilter noisingFilter=new AddNoisingFilter();
+		noisingFilter.setNoiseType(AddNoisingFilter.NOISE_TYPE_GAUSSION);
+		for(int i=1;i<=10;i++){
+			noisingFilter.setNosizeFactor(i*5);
+			temp=noisingFilter.filter(gray, null);
+			UtilDipose.savePictureJPG(temp, "灰度图像\\标准测试s\\"+i+".jpg");
+		}
+		noisingFilter.setNoiseType(AddNoisingFilter.NOISE_TYPE_POISSON);
+		for(int i=1;i<=10;i++){
+			noisingFilter.setNosizeFactor(i*20);
+			temp=noisingFilter.filter(gray, null);
+			UtilDipose.savePictureJPG(temp, "灰度图像\\标准测试s\\_"+i+".jpg");
+		}
+		
+		noisingFilter.setNoiseType(AddNoisingFilter.NOISE_TYPE_SALTANDPEPPER);
+		for(int i=1;i<=10;i++){
+			noisingFilter.setSalt_pepperPercent(0.2);
+			temp=noisingFilter.filter(gray, null);
+			UtilDipose.savePictureJPG(temp, "灰度图像\\标准测试\\_+"+i+".jpg");
+		}
+	}
+	
+	public static void printPE(double[] psnrs,double[] snr,double[] epi){
 		double psum=0,esum=0,ssum=0,pavg=0,savg=0,eavg=0;
 		double pMax=0,pMin=0,eMax=0,eMin=0,sMax=0,sMin=0;
 		int pMaxi,sMaxi,eMaxi,pMini,sMini,eMini;

@@ -1,15 +1,25 @@
-package graduategesign;
+package graduategesign.test;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Calendar; 
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mysql.jdbc.Util;
 
+import graduategesign.AddNoisingFilter;
+import graduategesign.MeanFilter;
+import graduategesign.SVDFilter;
+import graduategesign.StatisticalFilter;
+import graduategesign.UtilDipose;
+import graduategesign.test.model.SGImageModel;
+
 /**
  * 测试流程
+ * 单例模式
  * @author Administrator
  * 待实现中...
  */
@@ -44,13 +54,19 @@ public class TestFlow {
 	 * 均值滤波
 	 */
 	private MeanFilter meanFilter=new MeanFilter();
-	
+
+	List<SGImageModel> sgImages=new ArrayList<SGImageModel>();
+	private static TestFlow instance;
 	/*
 	 * 构造函数
 	 * @param srcImage 原图像
 	 */
-	public TestFlow(BufferedImage srcImage){
+	private TestFlow(BufferedImage srcImage){
 		intialize(srcImage);
+	}
+	
+	private TestFlow(){
+		
 	}
 	public String getTestId() {
 		return testId;
@@ -184,6 +200,14 @@ public class TestFlow {
 		}
 	}
 	
+	/**
+	 * 获取实例
+	 * @return
+	 */
+	public static TestFlow getInstance(){
+		return instance==null?new TestFlow():instance;
+	}
+	
 	private void intialize(BufferedImage srcImage){
 		testId=UtilDipose.lestPad(new Date().getTime()+"",'0',TEST_ID_BITS); 
 		pSavePath=saveBasePath+"/"+testId+"/iamges";
@@ -198,5 +222,9 @@ public class TestFlow {
 		//获取灰度图像并且保存
 		this.grayImage=UtilDipose.getGrayImage(srcImage, null);
 		UtilDipose.savePictureJPG(srcImage, grayName);
+	}
+	
+	public void addSGImage(BufferedImage source){
+		sgImages.add(new SGImageModel(source));
 	}
 }

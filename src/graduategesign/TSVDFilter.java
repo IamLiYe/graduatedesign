@@ -132,6 +132,10 @@ public class TSVDFilter  extends SVDFilter{
 		return dests;
 	}
 	
+	public int getSkip() {
+		return skip;
+	}
+
 	public List<BufferedImage> filter(List<BufferedImage> srcs,List<BufferedImage> dests){
 		if(srcs==null)
 			throw new NullPointerException("srcs is null");

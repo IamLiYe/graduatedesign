@@ -30,14 +30,47 @@ public class MeanFilter extends AbstractBufferedImageOp{
 	
 	private int kernel_size=3;//默认为
 	
+	public int getKernelSize(){
+		return this.kernel_size;
+	}
+	
+	public void setKernelSize(int kernel_size){
+		this.kernel_size=kernel_size;
+	}
+	
 	public void setMeanType(int type){
 		this.meanType=type;
 	}
 	
+	/**
+	 * 迭代次数
+	 */
+	private int workNumber=1;
+	
+	public int getWorkNumber() {
+		return workNumber;
+	}
+
+	public void setWorkNumber(int workNumber) {
+		this.workNumber = workNumber;
+	}
+
 	/*
 	 * 卷积核
 	 */
 	public static int[][] kernel={{1,1,1},{1,1,1},{1,1,1}};//卷积核
+	
+	
+	/***
+	 * 带迭代次数的均值滤波处理
+	 */
+	public BufferedImage filter_(BufferedImage src, BufferedImage dest) {
+		BufferedImage temp=src;
+		for(int i=0;i<workNumber;i++){
+			temp=filter(temp, null);
+		}
+		return temp;
+	}
 	
 	/**
 	 * 均值滤波处理

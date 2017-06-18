@@ -19,7 +19,11 @@ public class MainFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
 	
 	private FunctionPanel functionPanel;
-	private ImagePanel imagePanel;
+	public static ImagePanel imagePanel;
+	
+	public static ImagePanel getImagePanel(){
+		return imagePanel;
+	}
 	
 	private ObservePanel observePanel=new ObservePanel();
 	private MessagePnanel messagePnanel=new MessagePnanel();
@@ -78,21 +82,21 @@ public class MainFrame extends JFrame{
     			.setFill(GBC.VERTICAL)
     			.setAnchor(GBC.CENTER)
     			.setWeitht(0, 100));
-    	if(mLayout==container.getLayout()){
+    	/*if(mLayout==container.getLayout()){
     		System.out.println("11");
     	}
     	else{
     		System.out.println("__");
     		System.out.println(getLayout().getClass());
     		System.out.println(mLayout.getClass());
-    	}
+    	}*/
     }
     
     
     public static void main(String[] args){ 	
     	JFrame frame=new MainFrame("hello world");
     	//frame.setLayout(new FlowLayout());
-    	System.out.println(frame.getLayout().getClass());
+    	//System.out.println(frame.getLayout().getClass());
     	frame.setVisible(true);
     	frame.pack();
     	

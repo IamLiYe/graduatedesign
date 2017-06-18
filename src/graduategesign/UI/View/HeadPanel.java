@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -21,7 +22,10 @@ import com.hxtt.b.i;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.sun.org.apache.xml.internal.security.Init;
 
+import graduategesign.UtilDipose;
+import graduategesign.UI.Model.ImageModel;
 import graduategesign.UI.util.GBC;
+import graduategesign.test.TempTest;
 
 public class HeadPanel extends JPanel{
 
@@ -96,7 +100,24 @@ public class HeadPanel extends JPanel{
 				chooser.setFileFilter(new FileNameExtensionFilter(
 						"JPG&PNG Images","jpg","png"));
 				chooser.showOpenDialog(null);
-				chooser.getSelectedFile();
+				File file=chooser.getSelectedFile();
+				if(file!=null){
+					BufferedImage src=null;
+					try {
+						src = ImageIO.read(file);
+						TempTest.sourceImage=
+								new ImageModel("Ô­Í¼Ïñ",src);
+						TempTest.grayImage=
+								new ImageModel("»Ò¶ÈÍ¼Ïñ"
+										,UtilDipose.getGrayImage(src, null));
+						MainFrame.imagePanel.rePaint();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+				}
+				
 				System.out.println("XXX");
 			}
 					

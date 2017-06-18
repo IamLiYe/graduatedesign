@@ -62,6 +62,22 @@ public class StatisticalFilter extends AbstractBufferedImageOp{
 		this.kernel_size = kernel_size;
 	}
 	
+	public int getKernelSize(){
+		return this.kernel_size;
+	}
+	
+	public void setKernelSize(int kernelSize){
+		this.kernel_size=kernelSize;
+	}
+	
+	private int workNumber=1;
+	
+	public int getWorkNumber() {
+		return workNumber;
+	}
+	public void setWorkNumber(int workNumber) {
+		this.workNumber = workNumber;
+	}
 	public BufferedImage filter(BufferedImage srcImage,BufferedImage destImage){
 		if(destImage==null){
 			destImage=createCompatibleDestImage(srcImage, null);
@@ -153,7 +169,7 @@ public class StatisticalFilter extends AbstractBufferedImageOp{
 		Arrays.sort(bArray);
 		int index=kernel_size*kernel_size;
 		switch(this.type){
-		case STATISTICAL_TYPE_HALF:
+		case STATISTICAL_TYPE_CENTER:
 			rgb[0]=(rArray[index-1]+rArray[0])/2;
 			rgb[1]=(gArray[index-1]+gArray[0])/2;
 			rgb[2]=(bArray[index-1]+bArray[0])/2;
@@ -173,7 +189,7 @@ public class StatisticalFilter extends AbstractBufferedImageOp{
 			rgb[1]=gArray[index-1];
 			rgb[2]=bArray[index-1];
 			break;
-		case STATISTICAL_TYPE_CENTER:
+		case STATISTICAL_TYPE_HALF:
 			rgb[0]=rArray[index/2];
 			rgb[1]=gArray[index/2];
 			rgb[2]=bArray[index/2];
